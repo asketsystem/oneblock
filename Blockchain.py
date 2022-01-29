@@ -1,9 +1,13 @@
+from crypt import methods
 import hashlib
 import json
+from platform import node
 from time import time
-from email.headerregistry import Address
-from urllib3 import proxy_from_url
+from textwrap import dedent
+from urllib import response
 from uuid import uuid4
+
+from flask import Flask, jsonify, request
 
 
 class Blockchain(object):
@@ -13,7 +17,38 @@ class Blockchain(object):
 
         # Create the genesis block 
         self.new_block(previous_hash=1, proof=100)
+
+# Instantiate our Node 
+app = Flask(__name__)
+
+# Generate a globally unique address for this node 
+node_identifier = str(uuid4()).replace('-', '')
+
+#Instantiate the Blockchain
+blockchain = Blockchain()
+
+@app.route('./mine', methods=['GET'])
+def mine():
+    return "We'll mine a new Block"
+
+@app.route('/transactions/new', methods=['POST'])
+def new_transaction():
+    return "We'll add new transaction"
+
+@app.route('/chain', methods=['GET'])
+def full_chain():
+    response = {
+        'chain': blockchain.chain,
+        'length': len(blockchain.chain),
+    }
+    return jsonify(response), 200
+
+if __name__== '__main__':
+    app.run(host='0.0.0.0', port=5000)
     
+    
+    
+
     def proof_of_work(self, last_proof):
         """
         Simple Proof of Work Algorithm:
